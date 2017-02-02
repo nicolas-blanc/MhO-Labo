@@ -7,13 +7,25 @@
 //arguments du programme dans les propriétés du projet - débogage - arguements.
 //Sinon, utiliser le répertoire execution.
 
-// Permet de calculer le pas
+//Permet de calculer le pas d'avancée maximale lors d'une sélection d'une position
 #define FRACTION 3
-// Nombre de test d'insertion avant la position actuelle
-#define BEFORE 3
-// Nombre de test d'insertion après la position actuelle
-#define AFTER 3
+// Nombre de tests d'insertion avant la position actuelle
+#define NBTESTSBEFORE 3
+// Nombre de tests d'insertion après la position actuelle
+#define NBTESTSAFTER 3
 
+/* Définition du mode de débug:
+0 : Mode d'affichage minimum avec solution finale
+1 : Mode d'affichage avec affichage des solutions
+2 : Mode d'affichage minimum sans exécution bloquante ni affichage de solution
+*/
+int DEBUGMODE = 0;
+
+/* Définition du mode de descente:
+0 : Inversion
+1 : Insertion
+*/
+int CLIMBINGTYPE = 1;
 
 //*****************************************************************************************
 // Prototype des fonctions se trouvant dans la DLL 
@@ -77,34 +89,54 @@ int main(int NbParam, char *Param[])
 	NomFichier.assign(Param[1]);
 	LAlgo.NB_EVAL_MAX= atoi(Param[2]);
 
+
+	//Lecture des paramètres supplémentaires
+	if (NbParam > 3)
+	{
+		DEBUGMODE = atoi(Param[3]);
+		CLIMBINGTYPE = atoi(Param[4]);
+	}
+
 	//**Lecture du fichier de donnees'
 	LectureProbleme(NomFichier, LeProb, LAlgo);
-	//AfficherProbleme(LeProb);
+	if(DEBUGMODE == 1)
+		AfficherProbleme(LeProb);
 	
 	//**Création de la solution initiale 
 	CreerSolutionAleatoire(Courante, LeProb, LAlgo);
-	AfficherSolution(Courante, LeProb, "SolInitiale: ", true);
+	if(DEBUGMODE == 1)
+		AfficherSolution(Courante, LeProb, "SolInitiale: ", true);
 
 	do
 	{
 		Next = GetSolutionVoisine(Courante, LeProb, LAlgo);
-		//AfficherSolution(Courante, LeProb, "Courante: ", false);
-		//AfficherSolution(Next, LeProb, "Next: ", false);
+		if (DEBUGMODE == 1)
+		{
+			AfficherSolution(Courante, LeProb, "Courante: ", false);
+			AfficherSolution(Next, LeProb, "Next: ", false);
+		}
 		if (Next.FctObj <= Courante.FctObj)	//**amélioration
 		{
 				Courante = Next;
-
-// 				cout << "Fct Obj Nouvelle Courante: " << Courante.FctObj << endl;
-//  				AfficherSolution(Courante, LeProb, "NouvelleCourante: ", true);
+				//Affichage de la fonction objectif de la solution courante
+				if (DEBUGMODE == 1)
+				{
+					cout << "Fct Obj Nouvelle Courante: " << Courante.FctObj << endl;
+					AfficherSolution(Courante, LeProb, "NouvelleCourante: ", true);
+				}
 		}
 	}while (LAlgo.CptEval < LAlgo.NB_EVAL_MAX && Courante.FctObj!=0);
 
-	AfficherResultats(Courante, LeProb, LAlgo);
+	//Affichage de la solution finale retenue
+	if(DEBUGMODE < 2)
+		AfficherResultats(Courante, LeProb, LAlgo);
+
 	AfficherResultatsFichier(Courante, LeProb, LAlgo,"Resultats.txt");
 	
 	LibererMemoireFinPgm(Courante, Next, Best, LeProb);
 
- 	system("PAUSE");
+	if(DEBUGMODE != 2)
+ 		system("PAUSE");
 	return 0;
 }
 
@@ -119,14 +151,27 @@ TSolution GetSolutionVoisine (const TSolution uneSol, TProblem unProb, TAlgo &un
 	//Règle de pivot : À MODIFIER	(First-Impove)
 
 	TSolution unVoisin;
+	//Vérification du type de descente choisi
+	switch (CLIMBINGTYPE)
+	{
+	//Type Echange
+	case 0:
+		unVoisin = Echange(uneSol, unProb, unAlgo);
+		break;
+	//Type Insertion
+	case 1:
+		unVoisin = Insertion(uneSol, unProb, unAlgo);
+		break;
+	default:
+		//TODO : erreur
+		break;
+	} 	
 	
-// 	unVoisin = Echange(uneSol, unProb, unAlgo);
-	unVoisin = Insertion(uneSol, unProb, unAlgo);
 	return (unVoisin);
 }
 
 //DESCRIPTION: Echange de deux commandes sélectionnées aléatoirement
-/*
+
 TSolution Echange (const TSolution uneSol, TProblem unProb, TAlgo &unAlgo)
 {
 	TSolution Copie;
@@ -150,35 +195,34 @@ TSolution Echange (const TSolution uneSol, TProblem unProb, TAlgo &unAlgo)
 	//Le nouveau voisin doit être évalué 
 	EvaluerSolution(Copie, unProb, unAlgo);
 	return(Copie);
-}*/
+}
 
-TSolution createTempSolution(const TSolution uneSol, int posA, int pos, TProblem unProb)
+//DESCRIPTION: Création d'une solution temporaire pour l'insertion, décale les éléments selon la position de l'élément à insérer (posA) et sa nouvelle position (pos)
+
+TSolution CreateTempSolution(const TSolution uneSol, int posA, int pos, TProblem unProb)
 {
+	//Création d'une copie de la solution pour réordonner les éléments
 	TSolution copie;
 	CopierSolution(uneSol, copie, unProb);
 
-/*
-	for (int i = posA; i < pos - 1; i++)
-	{
-		copie.Seq[i] = copie.Seq[i + 1];
-	}
-	copie.Seq[pos - 1] = uneSol.Seq[posA];
-*/
-
 	for (int i = 0; i < unProb.NbCom; i++)
 	{
+		//Place l'élément posA à sa nouvelle position pos
 		if (i == pos)
 		{
 			copie.Seq[i] = uneSol.Seq[posA];
 		}
+		//Si l'élément i se trouve après pos et avant posA, il faut le décaler vers la position suivante (cas où pos < posA)
 		else if (i > pos && i <= posA)
 		{
 			copie.Seq[i] = uneSol.Seq[i - 1];
 		}
+		//Si l'élément i se trouve avant pos et après posA, il faut le décaler vers la position précédente (cas où posA < pos)
 		else if (i < pos && i >= posA)
 		{
 			copie.Seq[i] = uneSol.Seq[i + 1];
 		}
+		//Sinon, on recopie l'élément
 		else
 		{
 			copie.Seq[i] = uneSol.Seq[i];
@@ -188,6 +232,7 @@ TSolution createTempSolution(const TSolution uneSol, int posA, int pos, TProblem
 
 	return copie;
 }
+//DESCRIPTION: Comparaison de deux solutions et retourne la meilleure (objectif le plus faible)
 
 TSolution compare(TSolution tmpSol, TSolution bestTmpSol)
 {
@@ -201,20 +246,28 @@ TSolution compare(TSolution tmpSol, TSolution bestTmpSol)
 	}
 }
 
+//DESCRIPTION: Insertion d'une commande sélectionnée aléatoirement à différentes positions tirées également aléatoirement
+
 TSolution Insertion(const TSolution uneSol, const TProblem unProb, TAlgo &unAlgo)
 {
 	TSolution bestTmpSol, tmpSol;
 	int posA, posPred;
+	//Création d'un vecteur de positions, qui indique les positions tirées aléatoirement
+	//Ne sert pas ici
 	vector<int> posSol;
 
 	CopierSolution(uneSol, bestTmpSol, unProb);
 
+	//On tire aléatoirement une commande
 	posA = rand() % unProb.NbCom;
 	posPred = posA;
-
+	
+	//On tire également des positions aléatoires d'insertion avant posA à tester
 	int i = 0;
-	while (posPred >= 0 && i < BEFORE)
+	//On vérifie que la nouvelle position est correcte, et que le nombre de tests d'insertion est inférieur au maximum
+	while (posPred >= 0 && i < NBTESTSBEFORE)
 	{
+		//On 
 		posPred = posPred - rand() % (unProb.NbCom / FRACTION) - 1;
 
 		if (posPred > 0)
@@ -225,9 +278,11 @@ TSolution Insertion(const TSolution uneSol, const TProblem unProb, TAlgo &unAlgo
 		i++;
 	}
 
+	//On tire également des positions aléatoires d'insertion après posA à tester
 	i = 0;
 	posPred = posA;
-	while (posPred < unProb.NbCom && i < AFTER)
+	//On vérifie que la nouvelle position est correcte, et que le nombre de tests d'insertion est inférieur au maximum
+	while (posPred < unProb.NbCom && i < NBTESTSAFTER)
 	{
 		posPred = posPred + rand() % (unProb.NbCom / FRACTION) + 1;
 
@@ -239,21 +294,24 @@ TSolution Insertion(const TSolution uneSol, const TProblem unProb, TAlgo &unAlgo
 		i++;
 	}
 
+	//On vérifie pour chaque position tirée si la solution créée améliore ou non l'actuelle, et on la conserve si c'est le cas
 	for each (int pos in posSol)
 	{
-		tmpSol = createTempSolution(uneSol, posA, pos, unProb);
+		tmpSol = CreateTempSolution(uneSol, posA, pos, unProb);
 
 		if (unAlgo.CptEval < unAlgo.NB_EVAL_MAX)
 		{
 			EvaluerSolution(tmpSol, unProb, unAlgo);
-
-// 			AfficherSolution(tmpSol, unProb, "----- test intermediaire ----- PosA : " + std::to_string(posA) + " / pos : " + std::to_string(pos), false);
+			//Affichage de la solution intermédiaire proposée
+			if(DEBUGMODE == 1)
+				AfficherSolution(tmpSol, unProb, "----- test intermediaire ----- PosA : " + std::to_string(posA) + " / pos : " + std::to_string(pos), false);
 
 			bestTmpSol = compare(tmpSol, bestTmpSol);
 		}
 	}
 
-// 	AfficherSolution(bestTmpSol, unProb, "===== test final =====", false);
+	if(DEBUGMODE == 1)
+		AfficherSolution(bestTmpSol, unProb, "===== test final =====", false);
 
 	return bestTmpSol;
 }
