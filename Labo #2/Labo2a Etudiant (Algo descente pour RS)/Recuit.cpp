@@ -72,8 +72,42 @@ TSolution Echange(const TSolution uneSol, TProblem unProb, TRecuit &unRecuit);
 //DESCRIPTION: Insertion d'une commande sélectionnée aléatoirement à différentes positions tirées également aléatoirement
 TSolution Insertion(const TSolution uneSol, const TProblem unProb, TRecuit &unAlgo);
 
+void writeInformation(TRecuit LeRecuit, vector<int> delta, vector<double> temp, vector<int> degradations, int nbChangeTemp, int nbAcceptDegradation, int nbCalculDelta) 
+{
+	ofstream f_testDelta("testDelta.csv", ios::out | ios::trunc);  // ouverture en écriture avec effacement du fichier ouvert
+	if (!f_testDelta)
+		cerr << "Impossible d'ouvrir le fichier !" << endl;
 
-void updateTemp(TRecuit LeRecuit) {	LeRecuit.Temperature = LeRecuit.Alpha * LeRecuit.Temperature; }
+	f_testDelta << "t0;" << LeRecuit.TempInit << ";;Nombre Delta;" << nbCalculDelta << endl;
+	f_testDelta << "alpha;" << LeRecuit.Alpha << ";;Nombre Degradation;" << nbAcceptDegradation << endl;
+	f_testDelta << "nbPalier;" << LeRecuit.NbPalier << ";;Nombre Temperature;" << nbChangeTemp << endl;
+	f_testDelta << "nbEvalMax;" << LeRecuit.NB_EVAL_MAX << endl;
+	f_testDelta << endl;
+
+	f_testDelta << "numInc;Delta;Temp;exp(-d/T);degradation" << endl;
+
+	int expo = 0;
+	for (int i = 0; i < delta.size(); i++)
+	{
+		if (delta[i] != 0)
+		{
+			expo = exp((-delta[i]) / temp[i]);
+			f_testDelta << i << ";" << delta[i] << ";" << temp[i] << ";" << expo << ";" << degradations[i] << endl;
+/*
+			if (expo > 0)
+			{
+				f_testDelta << i << ";" << delta[i] << ";" << temp[i] << ";" << expo << ";" << degradations[i] << endl;
+			} 
+			else
+			{
+				f_testDelta << i << ";" << delta[i] << ";" << temp[i] << ";0;0" << endl;
+			}
+*/
+		}
+	}
+
+	f_testDelta.close();
+}
 
 //******************************************************************************************
 // Fonction main
@@ -87,12 +121,36 @@ int main(int NbParam, char *Param[])
 	TRecuit LeRecuit;		//Définition des paramètres du recuit simulé
 	string NomFichier;
 		
+	int nbChangeTemp = 0;
+	int nbAcceptDegradation = 0;
+	int nbCalculDelta = 0;
+	vector<int> delta;
+	vector<double> temp;
+	vector<int> degradation;
+
 	//**Lecture des paramètres
 	NomFichier.assign(Param[1]);
 	LeRecuit.TempInit	= atoi(Param[2]);
 	LeRecuit.Alpha		= atof(Param[3]);
 	LeRecuit.NbPalier	= atoi(Param[4]);
 	LeRecuit.NB_EVAL_MAX= atoi(Param[5]);
+
+	int duree = 0;
+
+	switch (CLIMBINGTYPE)
+	{
+		//Type Echange
+	case 0:
+		duree = LeRecuit.NB_EVAL_MAX / LeRecuit.NbPalier;
+		break;
+		//Type Insertion
+	case 1:
+		duree = (LeRecuit.NB_EVAL_MAX / NBTESTSAFTER) / LeRecuit.NbPalier;
+		break;
+	default:
+		//TODO : erreur
+		break;
+	}
 
 	//**Lecture du fichier de donnees
 	LectureProbleme(NomFichier, LeProb, LeRecuit);
@@ -114,6 +172,11 @@ int main(int NbParam, char *Param[])
 			//AfficherSolution(Courante, LeProb, "Courante: ", false);
 			//AfficherSolution(Next, LeProb, "Next: ", false);
 			LeRecuit.Delta = Next.FctObj - Courante.FctObj;
+
+			nbCalculDelta++;
+			delta.push_back(LeRecuit.Delta);
+			temp.push_back(LeRecuit.Temperature);
+	
 			if (LeRecuit.Delta <= 0)
 			{
 				Courante = Next;
@@ -123,24 +186,41 @@ int main(int NbParam, char *Param[])
 				{
 					Best = Courante;
 				}
+
+				degradation.push_back(0);
 			}
 			else
 			{
 				if (rand() / double(RAND_MAX) < exp((-LeRecuit.Delta) / LeRecuit.Temperature))
 				{
 					Courante = Next;
+					nbAcceptDegradation++;
+					degradation.push_back(1);
+				}
+				else
+				{
+					degradation.push_back(0);
 				}
 			}
 			LeRecuit.NoPalier++;
-		} while (LeRecuit.NoPalier != LeRecuit.NbPalier);
+		} while (LeRecuit.NoPalier != duree && LeRecuit.CptEval < LeRecuit.NB_EVAL_MAX);
 
-		updateTemp(LeRecuit);
+		LeRecuit.Temperature = LeRecuit.Alpha * LeRecuit.Temperature;
+		nbChangeTemp++;
 	}
 
 	AfficherResultats(Best, LeProb, LeRecuit);
 	AfficherResultatsFichier(Best, LeProb, LeRecuit,"Resultats.txt");
 	
 	LibererMemoireFinPgm(Courante, Next, Best, LeProb);
+
+	cout << "Duree : " << duree << endl;
+
+	cout << "Nombre de calcul du Delta : " << nbCalculDelta << endl;
+	cout << "Nombre de degradation : " << nbAcceptDegradation << endl;
+	cout << "Nombre de changement de Temperature : " << nbChangeTemp << endl;
+
+	writeInformation(LeRecuit, delta, temp, degradation, nbChangeTemp, nbAcceptDegradation, nbCalculDelta);
 
 	system("PAUSE");
 	return 0;
@@ -262,6 +342,7 @@ TSolution Insertion(const TSolution uneSol, const TProblem unProb, TRecuit &unAl
 	vector<int> posSol;
 
 	CopierSolution(uneSol, bestTmpSol, unProb);
+	bestTmpSol.FctObj = LONG_MAX;
 
 	//On tire aléatoirement une commande
 	posA = rand() % unProb.NbCom;
