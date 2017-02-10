@@ -94,6 +94,8 @@ void writeInformation(TRecuit LeRecuit, vector<int> delta, vector<double> temp, 
 			expo = exp((-delta[i]) / temp[i]);
 			f_testDelta << i << ";" << delta[i] << ";" << temp[i] << ";" << expo << ";" << degradations[i] << endl;
 /*
+
+			Si delta positif, on ne garde pas l'exponnetiel
 			if (expo > 0)
 			{
 				f_testDelta << i << ";" << delta[i] << ";" << temp[i] << ";" << expo << ";" << degradations[i] << endl;
@@ -145,7 +147,7 @@ int main(int NbParam, char *Param[])
 		break;
 		//Type Insertion
 	case 1:
-		duree = (LeRecuit.NB_EVAL_MAX / NBTESTSAFTER) / LeRecuit.NbPalier;
+		duree = (LeRecuit.NB_EVAL_MAX / 4) / LeRecuit.NbPalier;
 		break;
 	default:
 		//TODO : erreur
@@ -191,7 +193,9 @@ int main(int NbParam, char *Param[])
 			}
 			else
 			{
-				if (rand() / double(RAND_MAX) < exp((-LeRecuit.Delta) / LeRecuit.Temperature))
+				double k = rand() / double(RAND_MAX);
+				double l = exp((-LeRecuit.Delta) / LeRecuit.Temperature);
+				if (k < l)
 				{
 					Courante = Next;
 					nbAcceptDegradation++;
