@@ -72,39 +72,77 @@ TSolution Echange(const TSolution uneSol, TProblem unProb, TRecuit &unRecuit);
 //DESCRIPTION: Insertion d'une commande sélectionnée aléatoirement à différentes positions tirées également aléatoirement
 TSolution Insertion(const TSolution uneSol, const TProblem unProb, TRecuit &unAlgo);
 
-void writeInformation(TRecuit LeRecuit, vector<int> delta, vector<double> temp, vector<int> degradations, int nbChangeTemp, int nbAcceptDegradation, int nbCalculDelta) 
+void writeInformation(TRecuit LeRecuit, vector<int> delta, vector<double> temperature, vector<int> degradations, int nbChangeTemp, int nbAcceptDegradation, int nbCalculDelta) 
 {
 	ofstream f_testDelta("testDelta.csv", ios::out | ios::trunc);  // ouverture en écriture avec effacement du fichier ouvert
 	if (!f_testDelta)
 		cerr << "Impossible d'ouvrir le fichier !" << endl;
 
-	f_testDelta << "t0;" << LeRecuit.TempInit << ";;Nombre Delta;" << nbCalculDelta << endl;
-	f_testDelta << "alpha;" << LeRecuit.Alpha << ";;Nombre Degradation;" << nbAcceptDegradation << endl;
-	f_testDelta << "nbPalier;" << LeRecuit.NbPalier << ";;Nombre Temperature;" << nbChangeTemp << endl;
+	auto result = std::minmax_element(delta.begin(), delta.end());
+
+	int moyenneDelta = 0;
+	double moyenneExp = 0;
+	int nbPositif = 0;
+	for (auto i = 0; i < delta.size(); i++)
+	{
+		if (delta[i] > 0)
+		{
+			moyenneDelta += delta[i];
+			moyenneExp += exp((-delta[i]) / temperature[i]);
+			nbPositif++;
+		}
+	}
+	moyenneDelta /= nbPositif;
+	moyenneExp /= nbPositif;
+
+
+	f_testDelta << "t0;" << LeRecuit.TempInit << ";;Nombre Delta;" << nbCalculDelta << ";;Max Delta;" << delta[result.second - delta.begin()] << endl;
+	f_testDelta << "alpha;" << LeRecuit.Alpha << ";;Nombre Degradation;" << nbAcceptDegradation << ";;Moyenne Exp;" << moyenneExp << endl;
+	f_testDelta << "nbPalier;" << LeRecuit.NbPalier << ";;Nombre Temperature;" << nbChangeTemp << ";;Moyenne Delta;" << moyenneDelta << endl;
 	f_testDelta << "nbEvalMax;" << LeRecuit.NB_EVAL_MAX << endl;
+
 	f_testDelta << endl;
+	f_testDelta << "Temp;Delta < 0;Delta > 0 && Non;Delta > 0 && Oui" << endl;
+
+	double temp = temperature[0];
+	std::array<int, 3> nbdeg;
+	nbdeg.fill(0);
+
+	for (auto i = 0; i < degradations.size(); i++)
+	{
+		nbdeg[degradations[i]]++;
+
+		if (degradations[i] == 2)
+			degradations[i] = -1;
+
+		if (temp != temperature[i])
+		{
+			f_testDelta << temp << ";" << nbdeg[2] << ";" << nbdeg[0] << ";" << nbdeg[1] << endl;
+			nbdeg.fill(0);
+			temp = temperature[i];
+		}
+	}
+	f_testDelta << temp << ";" << nbdeg[2] << ";" << nbdeg[0] << ";" << nbdeg[1] << endl;
+
+	for (auto i = LeRecuit.NbPalier + 1; i < 12; i++)
+		f_testDelta << endl;
 
 	f_testDelta << "numInc;Delta;Temp;exp(-d/T);degradation" << endl;
 
-	int expo = 0;
-	for (int i = 0; i < delta.size(); i++)
+	double expo = 0;
+	for (auto i = 0; i < delta.size(); i++)
 	{
 		if (delta[i] != 0)
 		{
-			expo = exp((-delta[i]) / temp[i]);
-			f_testDelta << i << ";" << delta[i] << ";" << temp[i] << ";" << expo << ";" << degradations[i] << endl;
-/*
-
-			Si delta positif, on ne garde pas l'exponnetiel
-			if (expo > 0)
+			if (delta[i] < 0)
 			{
-				f_testDelta << i << ";" << delta[i] << ";" << temp[i] << ";" << expo << ";" << degradations[i] << endl;
+				f_testDelta << i << ";" << delta[i] << ";" << temperature[i] << ";-1;" << degradations[i] << endl;
 			} 
 			else
 			{
-				f_testDelta << i << ";" << delta[i] << ";" << temp[i] << ";0;0" << endl;
+				expo = exp((-delta[i]) / temperature[i]);
+				f_testDelta << i << ";" << delta[i] << ";" << temperature[i] << ";" << expo << ";" << degradations[i] << endl;
 			}
-*/
 		}
 	}
 
@@ -123,7 +161,7 @@ int main(int NbParam, char *Param[])
 	TRecuit LeRecuit;		//Définition des paramètres du recuit simulé
 	string NomFichier;
 		
-	int nbChangeTemp = 0;
+	int nbChangeTemp = 1;
 	int nbAcceptDegradation = 0;
 	int nbCalculDelta = 0;
 	vector<int> delta;
@@ -189,7 +227,7 @@ int main(int NbParam, char *Param[])
 					Best = Courante;
 				}
 
-				degradation.push_back(0);
+				degradation.push_back(2);
 			}
 			else
 			{
@@ -209,8 +247,11 @@ int main(int NbParam, char *Param[])
 			LeRecuit.NoPalier++;
 		} while (LeRecuit.NoPalier != duree && LeRecuit.CptEval < LeRecuit.NB_EVAL_MAX);
 
-		LeRecuit.Temperature = LeRecuit.Alpha * LeRecuit.Temperature;
-		nbChangeTemp++;
+		if (nbChangeTemp < LeRecuit.NbPalier)
+		{
+			LeRecuit.Temperature = LeRecuit.Alpha * LeRecuit.Temperature;
+			nbChangeTemp++;
+		}
 	}
 
 	AfficherResultats(Best, LeProb, LeRecuit);

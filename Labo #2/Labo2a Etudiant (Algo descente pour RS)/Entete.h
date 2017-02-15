@@ -10,6 +10,8 @@
 #include <ctime>  
 #include <cmath>
 #include <vector>
+#include <array>
+#include <algorithm>
 using namespace std;
 
 
