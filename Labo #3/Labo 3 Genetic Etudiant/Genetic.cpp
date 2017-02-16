@@ -136,7 +136,7 @@ int main(int NbParam, char *Param[])
 			CopierSolution(Pop[0], Best, LeProb);
 		cout << "Meilleure solution trouvee (Generation# "<< LeGenetic.Gen << "): " << Best.FctObj << endl;
 
-	}while (LeGenetic.CptEval < LeGenetic.NB_EVAL_MAX);	//**NE PAS ENLEVER
+	} while (LeGenetic.CptEval < LeGenetic.NB_EVAL_MAX);	//**NE PAS ENLEVER
 
 	AfficherResultats (Best, LeProb, LeGenetic);		//**NE PAS ENLEVER
 	AfficherResultatsFichier (Best, LeProb, LeGenetic, "Resutats.txt");
@@ -145,6 +145,47 @@ int main(int NbParam, char *Param[])
 
 	system("PAUSE");
 	return 0;
+}
+
+std::queue<int> initQueue(int cut, TIndividu Parent1, TIndividu Parent2, TProblem unProb)
+{
+	std::queue<int> q;
+	std::vector<int> v;
+
+	for (auto i = 0; i < cut; i++)
+	{
+		v.push_back(Parent1.Seq[i]);
+	}
+	v.push_back(Parent1.Seq[unProb.NbVilles - 1]);
+
+	for (auto i = 0; i < unProb.NbVilles; i++)
+	{
+		if (!(std::find(v.begin(), v.end(), Parent2.Seq[(i + cut) % unProb.NbVilles]) != v.end()))
+		{
+			q.push(Parent2.Seq[(i + cut) % unProb.NbVilles]);
+		}
+	}
+
+	return q;
+}
+
+bool EmpValide(TIndividu Enfant, int i, int v)
+{
+	throw std::logic_error("The method or operation is not implemented.");
+}
+
+TIndividu initEnfant(TIndividu Parent1, int cut, TProblem unProb)
+{
+	TIndividu Enfant;
+
+	CopierSolution(Parent1, Enfant, unProb);
+
+	for (auto i = cut; i < unProb.NbVilles - 1; i++)
+	{
+		Enfant.Seq[i] = -1;
+	}
+
+	return Enfant;
 }
 
 //******************************************************************************************************
@@ -158,10 +199,31 @@ TIndividu Croisement(TIndividu Parent1, TIndividu Parent2, TProblem unProb, TGen
 	//**INDICE: Le sous-programme rand() génère aléatoirement un nombre entier entre 0 et RAND_MAX (i.e., 32767) inclusivement.
 	//**Pour tirer un nombre aléatoire entier entre 0 et MAX-1 inclusivement, il suffit d'utiliser l'instruction suivante : NombreAleatoire = rand() % MAX;
 	
+	// 	CopierSolution(Parent1, Enfant, unProb);
 	TIndividu Enfant;
+	std::queue<int> villeNonVisite;
 
-	//METHODE BIDON: Recopie les genes du Parent1 dans l'enfant
-    CopierSolution(Parent1, Enfant, unProb);
+	int cut = (rand() % (unProb.NbVilles - 3)) + 1;
+	Enfant = initEnfant(Parent1, cut, unProb);
+
+	villeNonVisite = initQueue(cut, Parent1, Parent2, unProb);
+
+	int i = cut;
+	while (!villeNonVisite.empty())
+	{
+		int v = villeNonVisite.front();
+		villeNonVisite.pop();
+
+		if (EmpValide(Enfant, i, v))
+		{
+			Enfant.Seq[i] = v;
+			i++;
+		} 
+		else
+		{
+			villeNonVisite.push(v);
+		}
+	}
 
 	//**NE PAS ENLEVER
 	EvaluerSolution(Enfant, unProb, unGen);

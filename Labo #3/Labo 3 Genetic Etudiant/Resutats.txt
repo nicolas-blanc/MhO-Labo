@@ -1,0 +1,11 @@
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP09.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 1
+===============================================================================
+Nombre de generations effectuees : 5
+Nombre Total d'evaluations : 110
+Meilleure solution trouvee: 2250	  Etat: 	 VALIDE
+===============================================================================
