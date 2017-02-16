@@ -22,13 +22,13 @@
 1 : Mode d'affichage avec affichage des solutions
 2 : Mode d'affichage minimum sans exécution bloquante ni affichage de solution
 */
-#define DEBUGMODE 0
+int DEBUGMODE = 0;
 
 /* Définition du mode de descente:
 0 : Echange
 1 : Insertion
 */
-#define CLIMBINGTYPE 1
+int CLIMBINGTYPE = 1;
 
 //*****************************************************************************************
 // Prototype des fonctions se trouvant dans la DLL 
@@ -95,27 +95,47 @@ int main(int NbParam, char *Param[])
 	NomFichier.assign(Param[1]);
 	LTabou.NB_EVAL_MAX= atoi(Param[2]);
 
+
+	//Lecture des paramètres supplémentaires
+	if (NbParam > 3)
+	{
+		DEBUGMODE = atoi(Param[3]);
+		CLIMBINGTYPE = atoi(Param[4]);
+	}
 	//**Lecture du fichier de donnees
 	LectureProbleme(NomFichier, LeProb, LTabou);
-//	AfficherProbleme(LeProb);
+	if (DEBUGMODE == 1)
+		AfficherProbleme(LeProb);
 	
 	//**Création de la solution initiale 
 	CreerSolutionAleatoire(Courante, LeProb, LTabou);
-	AfficherSolution(Courante, LeProb, "SolInitiale: ", false);
+	if (DEBUGMODE == 1)
+		AfficherSolution(Courante, LeProb, "SolInitiale: ", false);
 
 	Best = Courante;
-
+	/*
 	int listeTabou[MAX_TABOU];
+	int curseurListeTabou = 0;
 	for (int i = 0; i < MAX_TABOU; i++)
 	{
 		listeTabou[i] = -1;
 	}
-
+	*/
+	TSolution listeTabou[MAX_TABOU];
+	int curseurListeTabou = 0;
 	do
 	{
 		Next = GetSolutionVoisine(Courante, LeProb, LTabou);
-		//AfficherSolution(Courante, LeProb, "Courante: ", false);
-		//AfficherSolution(Next, LeProb, "Next: ", false);
+		if (DEBUGMODE == 1)
+		{
+			AfficherSolution(Courante, LeProb, "Courante: ", false);
+			AfficherSolution(Next, LeProb, "Next: ", false);
+		}
+		/*
+
+		//Version de la liste de tabous avec enregistrement des insertions
+
+		//On cherche l'élément qui vient d'être déplacé entre les deux configurations (Next et Courante)
 		int insere = chercherInsertion(LeProb, Next, Courante);
 		bool estTabou = false;
 		//On vérifie que l'élément déplacé de la solution retenue ne fait pas partie de la liste de tabous
@@ -129,27 +149,53 @@ int main(int NbParam, char *Param[])
 		{
 				Courante = Next;
 				cout << "Fct Obj Nouvelle Courante: " << Courante.FctObj << endl;
-				//AfficherSolution(Courante, LeProb, "NouvelleCourante: ", false);
-				//Après avoir remplacé la solution courante, on ajoute l'élément inséré à la liste de tabous
-				for (int i = 0; i < MAX_TABOU; i++)
-				{
-					if (listeTabou[i] == -1)
-					{
-						listeTabou[i] = insere;
-						break;
-					}
-				}
+				if (DEBUGMODE == 1)
+					AfficherSolution(Courante, LeProb, "NouvelleCourante: ", false);
+				//Après avoir remplacé la solution courante, on ajoute l'élément inséré à la liste de tabou
+				listeTabou[curseurListeTabou] = insere;
+				curseurListeTabou = (curseurListeTabou + 1 >= MAX_TABOU ? 0 : curseurListeTabou + 1);
 		}
+		*/
+
+		//Version de la liste de tabous avec enregistrement des commandes entières
+		bool tmp = true;
+		bool estTabou = false;
+		for (int i = 0; i < MAX_TABOU; i++)
+		{
+			if (listeTabou[curseurListeTabou].Seq.size() != 0)
+			{
+				for (int j = 0; j < LeProb.NbCom; j++)
+				{
+					if (listeTabou[i].Seq[j] != Next.Seq[j])
+						tmp = false;
+				}
+				estTabou = estTabou | tmp;
+				tmp = true;
+			}
+		}
+		if (!estTabou || Next.FctObj <= Best.FctObj)
+		{
+			Courante = Next;
+			cout << "Fct Obj Nouvelle Courante: " << Courante.FctObj << endl;
+			if (DEBUGMODE == 1)
+				AfficherSolution(Courante, LeProb, "NouvelleCourante: ", false);
+			//Après avoir remplacé la solution courante, on ajoute l'élément inséré à la liste de tabous
+			CopierSolution(Courante, listeTabou[curseurListeTabou], LeProb);
+			curseurListeTabou = (curseurListeTabou + 1 >= MAX_TABOU ? 0 : curseurListeTabou + 1);
+		}
+		
 		if (Courante.FctObj <= Best.FctObj)
 			Best = Courante;
 	}while (LTabou.CptEval < LTabou.NB_EVAL_MAX && Courante.FctObj!=0);
 
-	AfficherResultats(Best, LeProb, LTabou);
+	if (DEBUGMODE < 2)
+		AfficherResultats(Best, LeProb, LTabou);
 	AfficherResultatsFichier(Best, LeProb, LTabou,"Resultats.txt");
 	
 	LibererMemoireFinPgm(Courante, Next, Best, LeProb);
 
-	system("PAUSE");
+	if (DEBUGMODE != 2)
+		system("PAUSE");
 	return 0;
 }
 
@@ -333,12 +379,12 @@ int chercherInsertion(const TProblem unProb, const TSolution Next, const TSoluti
 {
 	int candidat = -1;
 	for (int i = 0; i < unProb.NbCom-1; i++)
-		//Si les éléments comparés sont différents, on vérifie si il n'a pas été déplacé vers la gauche entre Next et Courante
-		//Dans le cas où l'insertion est vers l'arrière de la séquence, on va d'abord rencontré les éléments qui auront été décalés, donc seront égaux à l'élément d'indice suivant dans Courante, et seront ignorés par la condition
-		//Dans le cas où on a une insertion vers l'avant de la séquence, l'élément inséré sera le premier élément différent rencontré, 
-		//Il y a alors deux cas possibles: si l'élément suivant (i+1) dans Courante est différent on est sûr qu'il s'agit de l'élément inséré car c'est le premier différent
-		//Il est envisageable cependant qu'ils soient égaux, si l'insertion revient à échanger deux éléments consécutifs
-		//Dans ce cas, on doit sauvegarder le premier élément qui était différent (indice i), et attendre la fin de la boucle pour être sûr d'être dans cette configuration
+		/*Si les éléments comparés sont différents, on vérifie si il n'a pas été déplacé vers la gauche entre Next et Courante
+		Dans le cas où l'insertion est vers l'arrière de la séquence, on va d'abord rencontré les éléments qui auront été décalés, donc seront égaux à l'élément d'indice suivant dans Courante, et seront ignorés par la condition
+		Dans le cas où on a une insertion vers l'avant de la séquence, l'élément inséré sera le premier élément différent rencontré, 
+		Il y a alors deux cas possibles: si l'élément suivant (i+1) dans Courante est différent on est sûr qu'il s'agit de l'élément inséré car c'est le premier différent
+		Il est envisageable cependant qu'ils soient égaux, si l'insertion revient à échanger deux éléments consécutifs
+		Dans ce cas, on doit sauvegarder le premier élément qui était différent (indice i), et attendre la fin de la boucle pour être sûr d'être dans cette configuration*/
 		if (Next.Seq[i] != Courante.Seq[i]) 
 		{
 			if (Next.Seq[i] != Courante.Seq[i + 1])

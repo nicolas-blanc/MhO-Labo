@@ -19,13 +19,13 @@
 1 : Mode d'affichage avec affichage des solutions
 2 : Mode d'affichage minimum sans exécution bloquante ni affichage de solution
 */
-#define DEBUGMODE 0
+int DEBUGMODE = 0;
 
 /* Définition du mode de descente:
 0 : Echange
 1 : Insertion
 */
-#define CLIMBINGTYPE 1
+int CLIMBINGTYPE = 1;
 
 //*****************************************************************************************
 // Prototype des fonctions se trouvant dans la DLL 
@@ -177,6 +177,13 @@ int main(int NbParam, char *Param[])
 	LeRecuit.NbPalier	= atoi(Param[4]);
 	LeRecuit.NB_EVAL_MAX= atoi(Param[5]);
 
+	//Lecture des paramètres supplémentaires
+	if (NbParam > 6)
+	{
+		DEBUGMODE = atoi(Param[6]);
+		CLIMBINGTYPE = atoi(Param[7]);
+	}
+
 	int duree = 0;
 
 	switch (CLIMBINGTYPE)
@@ -196,11 +203,13 @@ int main(int NbParam, char *Param[])
 
 	//**Lecture du fichier de donnees
 	LectureProbleme(NomFichier, LeProb, LeRecuit);
-	//AfficherProbleme(LeProb);
+	if (DEBUGMODE == 1)
+		AfficherProbleme(LeProb);
 	
 	//**Création de la solution initiale 
 	CreerSolutionAleatoire(Courante, LeProb, LeRecuit);
-	AfficherSolution(Courante, LeProb, "SolInitiale: ", false);
+	if (DEBUGMODE == 1)
+		AfficherSolution(Courante, LeProb, "SolInitiale: ", false);
 
 	Best = Courante;
 	LeRecuit.Temperature = LeRecuit.TempInit;
@@ -211,8 +220,11 @@ int main(int NbParam, char *Param[])
 		do
 		{
 			Next = GetSolutionVoisine(Courante, LeProb, LeRecuit);
-			//AfficherSolution(Courante, LeProb, "Courante: ", false);
-			//AfficherSolution(Next, LeProb, "Next: ", false);
+			if (DEBUGMODE == 1)
+			{
+				AfficherSolution(Courante, LeProb, "Courante: ", false);
+				AfficherSolution(Next, LeProb, "Next: ", false);
+			}
 			LeRecuit.Delta = Next.FctObj - Courante.FctObj;
 
 			nbCalculDelta++;
@@ -222,8 +234,16 @@ int main(int NbParam, char *Param[])
 			if (LeRecuit.Delta <= 0)
 			{
 				Courante = Next;
+<<<<<<< HEAD
 // 				cout << "Fct Obj Nouvelle Courante: " << Courante.FctObj << endl;
 				//AfficherSolution(Courante, LeProb, "NouvelleCourante: ", false);
+=======
+				if (DEBUGMODE == 1)
+				{
+					cout << "Fct Obj Nouvelle Courante: " << Courante.FctObj << endl;
+					AfficherSolution(Courante, LeProb, "NouvelleCourante: ", false);
+				}
+>>>>>>> 208d06e92718307fe69c21eb4808979509714a52
 				if (Courante.FctObj < Best.FctObj)
 				{
 					Best = Courante;
@@ -255,20 +275,23 @@ int main(int NbParam, char *Param[])
 		}
 	}
 
-	AfficherResultats(Best, LeProb, LeRecuit);
+	if (DEBUGMODE < 2)
+		AfficherResultats(Best, LeProb, LeRecuit);
 	AfficherResultatsFichier(Best, LeProb, LeRecuit,"Resultats.txt");
 	
 	LibererMemoireFinPgm(Courante, Next, Best, LeProb);
+	if (DEBUGMODE < 2)
+	{
+		cout << "Duree : " << duree << endl;
 
-	cout << "Duree : " << duree << endl;
-
-	cout << "Nombre de calcul du Delta : " << nbCalculDelta << endl;
-	cout << "Nombre de degradation : " << nbAcceptDegradation << endl;
-	cout << "Nombre de changement de Temperature : " << nbChangeTemp << endl;
-
+		cout << "Nombre de calcul du Delta : " << nbCalculDelta << endl;
+		cout << "Nombre de degradation : " << nbAcceptDegradation << endl;
+		cout << "Nombre de changement de Temperature : " << nbChangeTemp << endl;
+	}
 	writeInformation(LeRecuit, delta, temp, degradation, nbChangeTemp, nbAcceptDegradation, nbCalculDelta);
 
-	system("PAUSE");
+	if (DEBUGMODE != 2)
+		system("PAUSE");
 	return 0;
 }
 
