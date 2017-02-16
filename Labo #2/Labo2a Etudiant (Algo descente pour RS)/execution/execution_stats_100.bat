@@ -8,15 +8,14 @@ REM 0)EXECUTABLE 1)NOM_FICHIER 2)Temperature initiale 3)Alpha 4)NB palier 5)NB_E
 set NB_EVAL_MAX=6000
 
 :: Définition du nombre de répétitions
-set NB_REPET=10
+set NB_REPET=5
 
-set TEMPERATURE_INITIALE=1
-set ALPHA=0.1
-set NB_PALIER=1000
+set TEMPERATURE_INITIALE=300
+set ALPHA=0.6
+set NB_PALIER=5
 
 set DEBUG_MODE=2
 set CLIMBING_TYPE=1
-
 
 @echo off
 :: Activation de l'expansion retardée pour les boucles for

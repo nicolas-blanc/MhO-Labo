@@ -234,16 +234,13 @@ int main(int NbParam, char *Param[])
 			if (LeRecuit.Delta <= 0)
 			{
 				Courante = Next;
-<<<<<<< HEAD
-// 				cout << "Fct Obj Nouvelle Courante: " << Courante.FctObj << endl;
-				//AfficherSolution(Courante, LeProb, "NouvelleCourante: ", false);
-=======
+
 				if (DEBUGMODE == 1)
 				{
 					cout << "Fct Obj Nouvelle Courante: " << Courante.FctObj << endl;
 					AfficherSolution(Courante, LeProb, "NouvelleCourante: ", false);
 				}
->>>>>>> 208d06e92718307fe69c21eb4808979509714a52
+
 				if (Courante.FctObj < Best.FctObj)
 				{
 					Best = Courante;
