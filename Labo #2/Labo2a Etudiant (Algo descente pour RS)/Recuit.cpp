@@ -72,6 +72,7 @@ TSolution Echange(const TSolution uneSol, TProblem unProb, TRecuit &unRecuit);
 //DESCRIPTION: Insertion d'une commande sélectionnée aléatoirement à différentes positions tirées également aléatoirement
 TSolution Insertion(const TSolution uneSol, const TProblem unProb, TRecuit &unAlgo);
 
+// Permet de creer un fichier csv directement importable et utilisable dans le fichier d'analyse Excel
 void writeInformation(TRecuit LeRecuit, vector<int> delta, vector<double> temperature, vector<int> degradations, int nbChangeTemp, int nbAcceptDegradation, int nbCalculDelta) 
 {
 	ofstream f_testDelta("testDelta.csv", ios::out | ios::trunc);  // ouverture en écriture avec effacement du fichier ouvert
@@ -160,7 +161,8 @@ int main(int NbParam, char *Param[])
 	TProblem LeProb;		//Définition de l'instance de problème
 	TRecuit LeRecuit;		//Définition des paramètres du recuit simulé
 	string NomFichier;
-		
+	
+	// Variable permmetant de recuperer le nmaximun d'information du programme
 	int nbChangeTemp = 1;
 	int nbAcceptDegradation = 0;
 	int nbCalculDelta = 0;
@@ -220,7 +222,7 @@ int main(int NbParam, char *Param[])
 			if (LeRecuit.Delta <= 0)
 			{
 				Courante = Next;
-				cout << "Fct Obj Nouvelle Courante: " << Courante.FctObj << endl;
+// 				cout << "Fct Obj Nouvelle Courante: " << Courante.FctObj << endl;
 				//AfficherSolution(Courante, LeProb, "NouvelleCourante: ", false);
 				if (Courante.FctObj < Best.FctObj)
 				{
@@ -231,9 +233,7 @@ int main(int NbParam, char *Param[])
 			}
 			else
 			{
-				double k = rand() / double(RAND_MAX);
-				double l = exp((-LeRecuit.Delta) / LeRecuit.Temperature);
-				if (k < l)
+				if (rand() / double(RAND_MAX) < exp((-LeRecuit.Delta) / LeRecuit.Temperature))
 				{
 					Courante = Next;
 					nbAcceptDegradation++;
@@ -247,6 +247,7 @@ int main(int NbParam, char *Param[])
 			LeRecuit.NoPalier++;
 		} while (LeRecuit.NoPalier != duree && LeRecuit.CptEval < LeRecuit.NB_EVAL_MAX);
 
+		// Permet de verifier que le programme ne change pas de palier si le nombre maximum est atteint
 		if (nbChangeTemp < LeRecuit.NbPalier)
 		{
 			LeRecuit.Temperature = LeRecuit.Alpha * LeRecuit.Temperature;
