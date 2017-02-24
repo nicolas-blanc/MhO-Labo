@@ -58,6 +58,7 @@ void Remplacement(std::vector<TIndividu> & Parents, std::vector<TIndividu> Enfan
 //*****************************************************************************************
 int main(int NbParam, char *Param[])
 {
+
 	TProblem LeProb;					//**Définition de l'instance de problème
 	TGenetic LeGenetic;					//**Définition des paramètres du recuit simulé
 	std::vector<TIndividu> Pop;			//**Population composée de Taille_Pop Individus 
@@ -128,13 +129,13 @@ int main(int NbParam, char *Param[])
 		
 		//**REMPLACEMENT de la population pour la prochaine génération
 		Remplacement(Pop, PopEnfant, LeProb, LeGenetic);
-		//AfficherSolutions(Pop, 0, LeGenetic.TaillePop, LeGenetic.Gen, LeProb);
+// 		AfficherSolutions(Pop, 0, LeGenetic.TaillePop, LeGenetic.Gen, LeProb);
 
 		//**Conservation de la meilleure solution
 		TrierPopulation(Pop, 0, LeGenetic.TaillePop);
 		if (Best.FctObj > Pop[0].FctObj)				//**NE PAS ENLEVER
 			CopierSolution(Pop[0], Best, LeProb);
-		cout << "Meilleure solution trouvee (Generation# "<< LeGenetic.Gen << "): " << Best.FctObj << endl;
+// 		cout << "Meilleure solution trouvee (Generation# "<< LeGenetic.Gen << "): " << Best.FctObj << endl;
 
 	} while (LeGenetic.CptEval < LeGenetic.NB_EVAL_MAX);	//**NE PAS ENLEVER
 
@@ -160,18 +161,13 @@ std::queue<int> initQueue(int cut, TIndividu Parent1, TIndividu Parent2, TProble
 
 	for (auto i = 0; i < unProb.NbVilles; i++)
 	{
-		if (!(std::find(v.begin(), v.end(), Parent2.Seq[(i + cut) % unProb.NbVilles]) != v.end()))
+		if (!(std::find(v.begin(), v.end(), Parent2.Seq[i]) != v.end()))
 		{
-			q.push(Parent2.Seq[(i + cut) % unProb.NbVilles]);
+			q.push(Parent2.Seq[i]);
 		}
 	}
 
 	return q;
-}
-
-bool EmpValide(TIndividu Enfant, int i, int v)
-{
-	throw std::logic_error("The method or operation is not implemented.");
 }
 
 TIndividu initEnfant(TIndividu Parent1, int cut, TProblem unProb)
@@ -208,28 +204,29 @@ TIndividu Croisement(TIndividu Parent1, TIndividu Parent2, TProblem unProb, TGen
 
 	villeNonVisite = initQueue(cut, Parent1, Parent2, unProb);
 
+	std::queue<int> cp_villeNonVisite;
+	cp_villeNonVisite = villeNonVisite;
+
 	int i = cut;
 	while (!villeNonVisite.empty())
 	{
 		int v = villeNonVisite.front();
 		villeNonVisite.pop();
 
-		if (EmpValide(Enfant, i, v))
-		{
-			Enfant.Seq[i] = v;
-			i++;
-		} 
-		else
-		{
-			villeNonVisite.push(v);
-		}
+		Enfant.Seq[i] = v;
+		i++;
 	}
 
 	//**NE PAS ENLEVER
 	EvaluerSolution(Enfant, unProb, unGen);
+
+	if (!Enfant.Valide)
+	{
+		throw std::logic_error("L'enfant n'est pas valide.");
+	}
+
 	return (Enfant);
 }
-
 
 //*******************************************************************************************************
 //Fonction qui réalise le REMPLACEMENT de la population pour la prochaine génération. Cette fonction doit
@@ -253,4 +250,62 @@ void Remplacement(std::vector<TIndividu> & Parents, std::vector<TIndividu> Enfan
 	//for(i=0; i< unGen.TaillePop; i++)
 	//	Temporaire[i].Seq.clear();
 	//Temporaire.clear();
+
+	std::vector<TIndividu> Temporaire;
+	Temporaire.resize(unGen.TaillePop);
+
+	int tPop = unGen.TaillePop;
+	int tPopEnfant = unGen.TaillePopEnfant;
+
+	int a, b;
+	std::vector<TIndividu>* v1;
+	std::vector<TIndividu>* v2;
+
+	for (auto i = 0; i < unGen.TaillePop; i++)
+	{
+		tPop = Parents.size();
+		tPopEnfant = Enfants.size();
+
+		switch (rand()%3)
+		{
+		case 0:
+			a = rand() % tPop;
+			b = rand() % tPopEnfant;
+
+			v1 = &Parents;
+			v2 = &Enfants;
+			break;
+		case 1:
+			a = rand() % tPop;
+			b = rand() % tPop;
+
+			v1 = &Parents;
+			v2 = &Parents;
+			break;
+		case 2:
+			a = rand() % tPopEnfant;
+			b = rand() % tPopEnfant;
+
+			v1 = &Enfants;
+			v2 = &Enfants;
+			break;
+		}
+
+		if (v1->at(a).FctObj < v2->at(b).FctObj)
+		{
+			CopierSolution(v1->at(a), Temporaire[i], unProb);
+			v1->erase(v1->begin() + a);
+		} 
+		else
+		{
+			CopierSolution(v2->at(b), Temporaire[i], unProb);
+			v2->erase(v2->begin() + b);
+		}
+	}
+
+	Parents.resize(unGen.TaillePop);
+	for (auto i = 0; i < unGen.TaillePop; i++)
+	{
+		CopierSolution(Temporaire[i], Parents[i], unProb);
+	}
 }

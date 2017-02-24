@@ -9,3 +9,278 @@ Nombre de generations effectuees : 5
 Nombre Total d'evaluations : 110
 Meilleure solution trouvee: 2250	  Etat: 	 VALIDE
 ===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP09.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 1
+===============================================================================
+Nombre de generations effectuees : 5
+Nombre Total d'evaluations : 110
+Meilleure solution trouvee: 1850	  Etat: 	 NON VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP09.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 1
+===============================================================================
+Nombre de generations effectuees : 5
+Nombre Total d'evaluations : 110
+Meilleure solution trouvee: 1925	  Etat: 	 NON VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP09.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 1
+===============================================================================
+Nombre de generations effectuees : 5
+Nombre Total d'evaluations : 110
+Meilleure solution trouvee: 2150	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP09.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 1
+===============================================================================
+Nombre de generations effectuees : 5
+Nombre Total d'evaluations : 110
+Meilleure solution trouvee: 2475	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP09.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 1
+===============================================================================
+Nombre de generations effectuees : 5
+Nombre Total d'evaluations : 110
+Meilleure solution trouvee: 2600	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP09.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 1
+===============================================================================
+Nombre de generations effectuees : 5
+Nombre Total d'evaluations : 110
+Meilleure solution trouvee: 2625	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP09.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 0.2
+===============================================================================
+Nombre de generations effectuees : 834
+Nombre Total d'evaluations : 10004
+Meilleure solution trouvee: 2600	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 0.2
+===============================================================================
+Nombre de generations effectuees : 832
+Nombre Total d'evaluations : 10008
+Meilleure solution trouvee: 107	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 0.2
+===============================================================================
+Nombre de generations effectuees : 42
+Nombre Total d'evaluations : 510
+Meilleure solution trouvee: 79	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 0.2
+===============================================================================
+Nombre de generations effectuees : 40
+Nombre Total d'evaluations : 506
+Meilleure solution trouvee: 85	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 10	 Prob. croisement: 1	 Prob.Mutation: 0.2
+===============================================================================
+Nombre de generations effectuees : 41
+Nombre Total d'evaluations : 505
+Meilleure solution trouvee: 65	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 40	 Prob. croisement: 1	 Prob.Mutation: 0.2
+===============================================================================
+Nombre de generations effectuees : 21
+Nombre Total d'evaluations : 1046
+Meilleure solution trouvee: 68	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 40	 Prob. croisement: 1	 Prob.Mutation: 0.2
+===============================================================================
+Nombre de generations effectuees : 208
+Nombre Total d'evaluations : 10042
+Meilleure solution trouvee: 62	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 40	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 178
+Nombre Total d'evaluations : 10022
+Meilleure solution trouvee: 58	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 100	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 71
+Nombre Total d'evaluations : 10019
+Meilleure solution trouvee: 61	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 100	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 71
+Nombre Total d'evaluations : 10049
+Meilleure solution trouvee: 58	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 40	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 179
+Nombre Total d'evaluations : 10047
+Meilleure solution trouvee: 61	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 40	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 178
+Nombre Total d'evaluations : 10046
+Meilleure solution trouvee: 102	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 40	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 179
+Nombre Total d'evaluations : 10052
+Meilleure solution trouvee: 65	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP18.txt
+PARAMETRES
+Taille population: 40	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 179
+Nombre Total d'evaluations : 10014
+Meilleure solution trouvee: 57	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP27.txt
+PARAMETRES
+Taille population: 60	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 118
+Nombre Total d'evaluations : 10002
+Meilleure solution trouvee: 4371	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP27.txt
+PARAMETRES
+Taille population: 60	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 120
+Nombre Total d'evaluations : 10055
+Meilleure solution trouvee: 5243	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP27.txt
+PARAMETRES
+Taille population: 60	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 119
+Nombre Total d'evaluations : 10054
+Meilleure solution trouvee: 4667	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP42.txt
+PARAMETRES
+Taille population: 80	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 90
+Nombre Total d'evaluations : 10083
+Meilleure solution trouvee: 1004	  Etat: 	 VALIDE
+===============================================================================
+===============================================================================
+                                    RESULTATS FINAUX
+===============================================================================
+NOM FICHIER:	SOP42.txt
+PARAMETRES
+Taille population: 80	 Prob. croisement: 1	 Prob.Mutation: 0.4
+===============================================================================
+Nombre de generations effectuees : 89
+Nombre Total d'evaluations : 10059
+Meilleure solution trouvee: 823	  Etat: 	 VALIDE
+===============================================================================
