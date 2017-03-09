@@ -5,6 +5,11 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LaboGA", "LaboGA.vcxproj", "{3A6AA1DB-E169-4F34-ADE1-F7B06F86B083}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8545D08F-C077-4AA3-96B7-D300F28A72CF}"
+	ProjectSection(SolutionItems) = preProject
+		execution\execution.bat = execution\execution.bat
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

@@ -140,11 +140,11 @@ int main(int NbParam, char *Param[])
 	} while (LeGenetic.CptEval < LeGenetic.NB_EVAL_MAX);	//**NE PAS ENLEVER
 
 	AfficherResultats (Best, LeProb, LeGenetic);		//**NE PAS ENLEVER
-	AfficherResultatsFichier (Best, LeProb, LeGenetic, "Resutats.txt");
+	AfficherResultatsFichier (Best, LeProb, LeGenetic, "Resultat.txt");
 	
 	LibererMemoireFinPgm(Pop, PopEnfant, Best, LeProb, LeGenetic);
 
-	system("PAUSE");
+// 	system("PAUSE");
 	return 0;
 }
 
@@ -266,29 +266,40 @@ void Remplacement(std::vector<TIndividu> & Parents, std::vector<TIndividu> Enfan
 		tPop = Parents.size();
 		tPopEnfant = Enfants.size();
 
-		switch (rand()%3)
+		if (tPopEnfant == 0)
 		{
-		case 0:
-			a = rand() % tPop;
-			b = rand() % tPopEnfant;
-
-			v1 = &Parents;
-			v2 = &Enfants;
-			break;
-		case 1:
 			a = rand() % tPop;
 			b = rand() % tPop;
 
 			v1 = &Parents;
 			v2 = &Parents;
-			break;
-		case 2:
-			a = rand() % tPopEnfant;
-			b = rand() % tPopEnfant;
+		}
+		else
+		{
+			switch (rand()%3)
+			{
+			case 0:
+				a = rand() % tPop;
+				b = rand() % tPopEnfant;
 
-			v1 = &Enfants;
-			v2 = &Enfants;
-			break;
+				v1 = &Parents;
+				v2 = &Enfants;
+				break;
+			case 1:
+				a = rand() % tPop;
+				b = rand() % tPop;
+
+				v1 = &Parents;
+				v2 = &Parents;
+				break;
+			case 2:
+				a = rand() % tPopEnfant;
+				b = rand() % tPopEnfant;
+
+				v1 = &Enfants;
+				v2 = &Enfants;
+				break;
+			}
 		}
 
 		if (v1->at(a).FctObj < v2->at(b).FctObj)
